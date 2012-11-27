@@ -3,12 +3,15 @@
         ring.mock.request  
         doitnow.handler))
 
-(deftest test-app
-  (testing "main route"
-    (let [response (app (request :get "/"))]
-      (is (= (:status response) 200))
-      (is (= (:body response) "Hello World"))))
-  
-  (testing "not-found route"
-    (let [response (app (request :get "/invalid"))]
-      (is (= (:status response) 404)))))
+(deftest test-base-api
+  (testing "API Options"
+    (let [response (api-routes (request :options "/api"))]
+      (is (= (response :status) 200))
+      (is (contains? (response :body) :version))))
+  (testing "API Get"
+    (let [response (api-routes (request :get "/api"))]
+      (is (= (response :status) 405))
+      (is (nil? (response :body)))))
+  (testing "Not Found"
+    (let [response (api-routes (request :get "/invalid"))]
+      (is (= (response :status) 404)))))
