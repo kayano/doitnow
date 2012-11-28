@@ -26,4 +26,5 @@
     (handler/api api-routes)
     (wrap-request-logger)
     (wrap-exception-handler)
+    (wrap-response-logger)
     (wrap-restful-response)))

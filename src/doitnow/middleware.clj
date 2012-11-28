@@ -20,8 +20,9 @@
   (fn [req]
     (let [response (handler req)
           {remote-addr :remote-addr request-method :request-method uri :uri} req
-          {status :status} response]
-      (log/debug remote-addr (upper-case (name request-method)) uri "->" status)
+          {status :status body :body} response]
+      (log/debug remote-addr (upper-case (name request-method)) uri "->" status
+        (if (contains? body :exception) (str (body :exception) ": " (body :message)) ""))
       response)))
 
 (defn wrap-exception-handler
@@ -32,7 +33,6 @@
       (handler req)
       (catch Exception e
         (let [{remote-addr :remote-addr request-method :request-method uri :uri} req]
-          (log/warn e remote-addr (upper-case (name request-method)) uri "-> 500 " e)
           (->
             (response {:exception (.getName (class e)) :message (.getMessage e)})
             (status 500)))))))
