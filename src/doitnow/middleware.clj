@@ -1,8 +1,33 @@
 (ns doitnow.middleware
   (:use compojure.core
         ring.util.response
-        [clojure.string :only [upper-case]])
-  (:require [clojure.tools.logging :as log]))
+        [clojure.string :only [upper-case]]
+        [cheshire.custom :only [JSONable]])
+  (:require [clojure.tools.logging :as log])
+  (:import (com.fasterxml.jackson.core JsonGenerator)))
+
+;;
+;; dakrone/cheshire JSON library extensions
+;; See https://github.com/dakrone/cheshire
+;;
+
+(defn- encode-exception
+  "Encodes a java.lang.Exception to JSON as a map of exception class & message"
+  [^Exception e ^JsonGenerator jg]
+  (.writeStartObject jg)
+  (.writeFieldName jg "exception")
+  (.writeString jg (.getName (class e)))
+  (.writeFieldName jg "message")
+  (.writeString jg (.getMessage e))
+  (.writeEndObject jg))
+
+(extend java.lang.Exception
+  JSONable
+  {:to-json encode-exception})
+
+;;
+;; Middleware Handlers
+;;
 
 (defn wrap-request-logger
   "Ring middleware function that uses clojure.tools.logging to write a debug message
@@ -21,9 +46,8 @@
     (let [response (handler req)
           {remote-addr :remote-addr request-method :request-method uri :uri} req
           {status :status body :body} response]
-      (if (contains? body :exception)
-        (log/warn remote-addr (upper-case (name request-method)) uri "->" status
-          (str (body :exception) ": " (body :message)))
+      (if (instance? Exception body)
+        (log/warn body remote-addr (upper-case (name request-method)) uri "->" status body)
         (log/debug remote-addr (upper-case (name request-method)) uri "->" status))
       response)))
 
@@ -36,5 +60,5 @@
       (catch Exception e
         (let [{remote-addr :remote-addr request-method :request-method uri :uri} req]
           (->
-            (response {:exception (.getName (class e)) :message (.getMessage e)})
+            (response e)
             (status 500)))))))
