@@ -3,7 +3,7 @@
         ring.mock.request  
         doitnow.handler))
 
-(deftest test-base-api
+(deftest test-api-routes
   (testing "API Options"
     (let [response (api-routes (request :options "/api"))]
       (is (= (response :status) 200))
