@@ -58,7 +58,6 @@
     (try
       (handler req)
       (catch Exception e
-        (let [{remote-addr :remote-addr request-method :request-method uri :uri} req]
-          (->
-            (response e)
-            (status 500)))))))
+        (->
+          (response e)
+          (status 500))))))
