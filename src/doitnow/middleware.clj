@@ -11,19 +11,15 @@
 ;; See https://github.com/dakrone/cheshire
 ;;
 
-(defn- encode-exception
-  "Encodes a java.lang.Exception to JSON as a map of exception class & message"
-  [^Exception e ^JsonGenerator jg]
-  (.writeStartObject jg)
-  (.writeFieldName jg "exception")
-  (.writeString jg (.getName (class e)))
-  (.writeFieldName jg "message")
-  (.writeString jg (.getMessage e))
-  (.writeEndObject jg))
-
 (extend java.lang.Exception
   JSONable
-  {:to-json encode-exception})
+  {:to-json (fn [^Exception e ^JsonGenerator jg]
+    (.writeStartObject jg)
+    (.writeFieldName jg "exception")
+    (.writeString jg (.getName (class e)))
+    (.writeFieldName jg "message")
+    (.writeString jg (.getMessage e))
+    (.writeEndObject jg))})
 
 ;;
 ;; Middleware Handlers
@@ -52,7 +48,8 @@
       response)))
 
 (defn wrap-exception-handler
-  "Ring middleware function to trap any uncaught exceptions and return a standard 500 response"
+  "Ring middleware function to trap any uncaught exceptions and return a standard 500
+  response with the exception instance as the response body"
   [handler]
   (fn [req]
     (try
