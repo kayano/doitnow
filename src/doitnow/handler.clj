@@ -11,7 +11,7 @@
   (context "/api" []
     (OPTIONS "/" []
       (->
-        (response {:version "0.2.0-SNAPSHOT"})
+        (response {:version "0.3.0-SNAPSHOT"})
         (header "Allow" "OPTIONS")))
     (ANY "/" [] 
       (->
