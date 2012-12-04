@@ -10,9 +10,11 @@
   (ref 
     (-> {}
       (assoc (new-uuid)
-        {:title "Test Doit #1" :created (time/now) :due (time/plus (time/now) (time/days 2))})
+        {:title "Test Doit #1" :created (time/now)
+         :due (time/plus (time/now) (time/days 2))})
       (assoc (new-uuid)
-        {:title "Test DoIt #2" :created (time/now) :due (time/plus (time/now) (time/months 3))}))))
+        {:title "Test DoIt #2" :created (time/now)
+         :due (time/plus (time/now) (time/months 3))}))))
 
 (defn create-doit
   "Create a new DoIt"
@@ -23,9 +25,9 @@
     id))
 
 (defn query-doits
-  "Return a list of DoIts"
+  "Return a sequence of DoIts"
   []
-  (vals @doits))
+  (map #(merge (val %) {:id (key %)}) @doits))
 
 (defn get-doit
   "Get a DoIt by ID"
@@ -39,7 +41,8 @@
   [id doit]
   (if (contains? @doits id)
     ((dosync
-      (alter doits assoc id (merge (@doits id) doit {:updated (time/now)}))) id)))
+      (alter doits assoc id 
+        (merge (@doits id) (dissoc doit :id) {:updated (time/now)}))) id)))
 
 (defn delete-doit
   "Delete a DoIt"

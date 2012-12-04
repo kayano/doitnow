@@ -4,7 +4,8 @@
         [clojure.string :only [upper-case]]
         [cheshire.custom :only [JSONable]])
   (:require [clojure.tools.logging :as log]
-            [clj-time.core :as time])
+            [clj-time.core :as time]
+            [clj-time.format :as format])
   (:import (com.fasterxml.jackson.core JsonGenerator)))
 
 ;;
@@ -25,7 +26,9 @@
 (extend org.joda.time.DateTime
   JSONable
   {:to-json (fn [^org.joda.time.DateTime dt ^JsonGenerator jg]
-    (.writeString jg (.toString dt )))})
+    (.writeString jg (format/unparse
+                       (format/formatters :basic-date-time-no-ms)
+                       dt)))})
 
 ;;
 ;; Middleware Handlers
