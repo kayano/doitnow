@@ -3,7 +3,8 @@
         ring.util.response
         [clojure.string :only [upper-case]]
         [cheshire.custom :only [JSONable]])
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.tools.logging :as log]
+            [clj-time.core :as time])
   (:import (com.fasterxml.jackson.core JsonGenerator)))
 
 ;;
@@ -20,6 +21,11 @@
     (.writeFieldName jg "message")
     (.writeString jg (.getMessage e))
     (.writeEndObject jg))})
+
+(extend org.joda.time.DateTime
+  JSONable
+  {:to-json (fn [^org.joda.time.DateTime dt ^JsonGenerator jg]
+    (.writeString jg (.toString dt )))})
 
 ;;
 ;; Middleware Handlers

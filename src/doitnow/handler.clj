@@ -2,6 +2,7 @@
   (:use compojure.core
         ring.util.response
         doitnow.middleware
+        doitnow.data
         [ring.middleware.format-response :only [wrap-restful-response]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]))
@@ -17,7 +18,15 @@
       (->
         (response nil)
         (status 405)
-        (header "Allow" "OPTIONS"))))
+        (header "Allow" "OPTIONS")))
+    (context "/doits" []
+      (GET "/" []
+        (query-doits))
+      (ANY "/" []
+        (->
+        (response nil)
+        (status 405)
+        (header "Allow" "OPTIONS")))))
   (route/not-found "Nothing to see here, move along now"))
 
 (def app

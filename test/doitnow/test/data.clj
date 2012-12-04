@@ -18,7 +18,11 @@
 (deftest test-query-doits
   (testing "Query DoIts"
     (let [result (query-doits)]
-      (is (seq result)))))
+      (is (seq result))
+      (is (every? map? result))
+      (is (every? #(contains? % :id) result))
+      (is (every? #(contains? % :title) result))
+      (is (every? #(contains? % :created) result)))))
 
 (deftest test-get-doit
   (testing "Get existing DoIt"
