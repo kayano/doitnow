@@ -1,3 +1,5 @@
+;; Ring Middleware & Utility Functions
+;;
 (ns doitnow.middleware
   (:use compojure.core
         ring.util.response

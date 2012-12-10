@@ -1,3 +1,5 @@
+;; Main HTTP Request Handler
+;;
 (ns doitnow.handler
   (:use compojure.core
         ring.util.response
@@ -5,32 +7,23 @@
         doitnow.data
         [ring.middleware.format-response :only [wrap-restful-response]])
   (:require [compojure.handler :as handler]
-            [compojure.route :as route]))
+            [compojure.route :as route]
+            [doitnow.http :as http]))
 
 (defroutes api-routes
   "Main client API route definitions"
   (context "/api" []
     (OPTIONS "/" []
-      (->
-        (response {:version "0.3.0-SNAPSHOT"})
-        (header "Allow" "OPTIONS")))
+      (http/options [:options] {:version "0.3.0-SNAPSHOT"}))
     (ANY "/" [] 
-      (->
-        (response nil)
-        (status 405)
-        (header "Allow" "OPTIONS")))
+      (http/method-not-allowed [:options]))
     (context "/doits" []
       (GET "/" []
-        (query-doits))
+        (http/no-content? (query-doits)))
       (OPTIONS "/" []
-        (->
-          (response nil)      
-          (header "Allow" "OPTIONS,GET")))
+        (http/options [:options :get]))
       (ANY "/" []
-        (->
-          (response nil)
-          (status 405)
-          (header "Allow" "OPTIONS,GET")))))
+        (http/method-not-allowed [:options :get]))))
   (route/not-found "Nothing to see here, move along now"))
 
 (def app

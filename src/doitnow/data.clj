@@ -1,3 +1,5 @@
+;; Mock Data Source & Functions
+;;
 (ns doitnow.data
   (:require [clojure.string :as str]
             [clj-time.core :as time])
@@ -6,7 +8,7 @@
 (defn new-uuid []
   (str/replace (str/upper-case (.toString (UUID/randomUUID))) "-" ""))
 
-(def doits 
+(def doits
   (ref 
     (-> {}
       (assoc (new-uuid)
@@ -42,7 +44,7 @@
   (if (contains? @doits id)
     ((dosync
       (alter doits assoc id 
-        (merge (@doits id) (dissoc doit :id) {:updated (time/now)}))) id)))
+        (merge (@doits id) (dissoc doit :id) {:modified (time/now)}))) id)))
 
 (defn delete-doit
   "Delete a DoIt"
