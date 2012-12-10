@@ -27,8 +27,7 @@
   JSONable
   {:to-json (fn [^org.joda.time.DateTime dt ^JsonGenerator jg]
     (.writeString jg (format/unparse
-                       (format/formatters :basic-date-time-no-ms)
-                       dt)))})
+                       (format/formatters :date-time-no-ms) dt)))})
 
 ;;
 ;; Middleware Handlers

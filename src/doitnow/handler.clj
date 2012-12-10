@@ -22,11 +22,15 @@
     (context "/doits" []
       (GET "/" []
         (query-doits))
+      (OPTIONS "/" []
+        (->
+          (response nil)      
+          (header "Allow" "OPTIONS,GET")))
       (ANY "/" []
         (->
-        (response nil)
-        (status 405)
-        (header "Allow" "OPTIONS")))))
+          (response nil)
+          (status 405)
+          (header "Allow" "OPTIONS,GET")))))
   (route/not-found "Nothing to see here, move along now"))
 
 (def app
