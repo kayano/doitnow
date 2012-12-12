@@ -3,12 +3,15 @@
         doitnow.data)
   (:require [clj-time.core :as time]))
 
-(defn- uuid?
-  "Tests for a UUID string: 32 characters, 0-9 & A-F, all upper-case"
-  [uuid]
-  (and
-    (string? uuid)
-    (re-matches #"[\dABCDEF]{32}" uuid)))
+(defn data-fixture [f]
+  (dosync
+    (alter doits assoc (new-uuid)
+      {:title "Test Doit #1" :created (time/now) :due (time/plus (time/now) (time/days 2))})
+    (alter doits assoc (new-uuid)
+      {:title "Test Doit #2" :created (time/now) :due (time/plus (time/now) (time/months 3))}))
+  (f))
+
+(use-fixtures :once data-fixture)
 
 (deftest test-new-uuid
   (testing "Create new UUID"

@@ -6,17 +6,18 @@
   (:import (java.util UUID)))
 
 (defn new-uuid []
-  (str/replace (str/upper-case (.toString (UUID/randomUUID))) "-" ""))
+  (.toString (UUID/randomUUID)))
+
+(defn uuid?
+  "Returns true if the string is a UUID: 36 characters, 0-9 & a-f with -'s"
+  [uuid]
+  (and
+    (string? uuid)
+    (re-matches #"[0-9a-f\-]{36}" uuid)))
 
 (def doits
-  (ref 
-    (-> {}
-      (assoc (new-uuid)
-        {:title "Test Doit #1" :created (time/now)
-         :due (time/plus (time/now) (time/days 2))})
-      (assoc (new-uuid)
-        {:title "Test DoIt #2" :created (time/now)
-         :due (time/plus (time/now) (time/months 3))}))))
+  "Empty map reference for use as a dummy datastore"
+  (ref {}))
 
 (defn create-doit
   "Create a new DoIt"
