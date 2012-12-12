@@ -30,3 +30,10 @@
       (response nil)
       (status 204))
     (response body)))
+
+(defn not-implemented
+  "Return an HTTP 501 (Not Implemented)"
+  []
+  (->
+    (response nil)
+    (status 501)))

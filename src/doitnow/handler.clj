@@ -20,10 +20,18 @@
     (context "/doits" []
       (GET "/" []
         (http/no-content? (query-doits)))
+      (GET "/:id" [id]
+        (http/no-content? (get-doit id)))
+      (POST "/" []
+        (http/not-implemented))
+      (PUT "/:id" [id]
+        (http/not-implemented))
+      (DELETE "/:id" [id]
+        (http/not-implemented))
       (OPTIONS "/" []
-        (http/options [:options :get]))
+        (http/options [:options :get :put :post :delete]))
       (ANY "/" []
-        (http/method-not-allowed [:options :get]))))
+        (http/method-not-allowed [:options :get :put :post :delete]))))
   (route/not-found "Nothing to see here, move along now"))
 
 (def app
