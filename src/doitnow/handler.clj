@@ -19,9 +19,11 @@
       (http/method-not-allowed [:options]))
     (context "/doits" []
       (GET "/" []
-        (http/no-content? (query-doits)))
+        (http/not-implemented))
       (GET "/:id" [id]
-        (http/no-content? (get-doit id)))
+        (http/not-implemented))
+      (HEAD "/:id" [id]
+        (http/not-implemented))
       (POST "/" []
         (http/not-implemented))
       (PUT "/:id" [id]
@@ -29,9 +31,9 @@
       (DELETE "/:id" [id]
         (http/not-implemented))
       (OPTIONS "/" []
-        (http/options [:options :get :put :post :delete]))
+        (http/options [:options :get :head :put :post :delete]))
       (ANY "/" []
-        (http/method-not-allowed [:options :get :put :post :delete]))))
+        (http/method-not-allowed [:options :get :head :put :post :delete]))))
   (route/not-found "Nothing to see here, move along now"))
 
 (def app
