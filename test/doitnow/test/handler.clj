@@ -16,13 +16,12 @@
     (let [response (api-routes (request :get "/invalid"))]
       (is (= (response :status) 404)))))
 
-;(deftest test-doit-routes
-;  (testing "List All DoIts"
-;    (let [response (api-routes (request :get "/api/doits"))
-;          doits (response :body)]
-;      (is (= (response :status) 200))
-;      (is (seq doits))
-;      (is (every? map? doits))
-;      (is (every? #(contains? % :id) doits))
-;      (is (every? #(contains? % :title) doits))
-;      (is (every? #(contains? % :created) doits)))))
+(deftest test-create-doit
+  (testing "Create valid doit"
+    (let [response (api-routes (request :post "/api/doits" {:title "Test DoIt"}))
+          body (response :body)
+          headers (response :headers)]
+      (is (= (response :status) 201))
+      (is (contains? headers "Location"))
+      (is (not (nil? body)))
+      (is (map? body)))))

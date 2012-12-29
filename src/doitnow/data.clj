@@ -8,6 +8,7 @@
             [monger.result :as result]
             [monger.util :as util]
             [monger.joda-time]
+            [monger.json]
             [clj-time.core :as time]))
 
 (def config { :db "doitnow" :collection "doits" })
@@ -44,5 +45,6 @@
     (if (empty? validation-errors)
       (do
         (collection/insert (config :collection) new-doit)
-        (str (new-doit :_id)))
+        ;; need to add success check
+        new-doit)
       (throw (IllegalArgumentException.)))))

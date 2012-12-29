@@ -31,8 +31,9 @@
                 :description "A test DoIt" 
                 :due (time/plus (time/now) (time/weeks 2))
                 :priority 1}
-          id (create-doit doit)]
-      (is (object-id? id))))
+          created (create-doit doit)]
+      (is (map? created))
+      (is (contains? created :_id))))
   (testing "Create Invalid DoIt"
     (is (thrown? IllegalArgumentException (create-doit {})))))
 

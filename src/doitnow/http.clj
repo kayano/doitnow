@@ -5,6 +5,13 @@
         ring.util.response
         [clojure.string :only [upper-case]]))
 
+(defn url-from 
+  "Create a location URL from request data"
+  ([{scheme :scheme server-name :server-name server-port :server-port context :context path-info :path-info}]
+    (url-from scheme server-name server-port context path-info))
+  ([scheme server-name server-port context path-info]
+    (str (name scheme) "://" server-name ":" server-port context path-info)))
+
 (defn options
   "Generate a 200 HTTP response with an Allow header containing the provided
   HTTP method names - response for an HTTP OPTIONS request"
