@@ -8,7 +8,9 @@
                  [ring-middleware-format "0.2.2"]
                  [org.clojure/tools.logging "0.2.4"]
                  [log4j/log4j "1.2.17"]
-                 [clj-time "0.4.4"]]
+                 [clj-time "0.4.4"]
+                 [com.novemberain/monger "1.3.4"]
+                 [com.novemberain/validateur "1.2.0"]]
   :plugins [[lein-ring "0.7.5"]]
   :ring {:handler doitnow.handler/app}
   :profiles

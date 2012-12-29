@@ -1,57 +1,48 @@
-;; Mock Data Source & Functions
+;; MongoDB Interface
 ;;
 (ns doitnow.data
-  (:require [clojure.string :as str]
-            [clj-time.core :as time])
-  (:import (java.util UUID)))
+  (:use [monger.core :only [connect! connect set-db! get-db]]
+        [validateur.validation])
+  (:require [monger.collection :as collection]
+            [monger.conversion :as conversion]
+            [monger.result :as result]
+            [monger.util :as util]
+            [monger.joda-time]
+            [clj-time.core :as time]))
 
-(def doits
-  "Empty map reference for use as a dummy datastore"
-  (ref {}))
+(def config { :db "doitnow" :collection "doits" })
 
-(defn new-uuid
-  "Generates a new UUID string"
-  []
-  (.toString (UUID/randomUUID)))
+(connect!)
+(set-db! (monger.core/get-db (config :db)))
 
-(defn uuid?
-  "Returns true if the string is a UUID: 36 characters, 0-9 & a-f with -'s"
-  [uuid]
-  (and
-    (not (nil? uuid))
-    (string? uuid)
-    (re-matches #"[0-9a-f\-]{36}" uuid)))
+(defn- with-oid
+  "Add a new Object ID to a DoIt"
+  [doit]
+  (merge { :_id (util/object-id) } doit))
+
+(defn- created-now
+  "Set the created time in a DoIt to the current time"
+  [doit]
+  (merge { :created (time/now) } doit))
+
+(defn- modified-now
+  "Set the modified time in a DoIt to the current time"
+  [doit]
+  (merge { :modified (time/now) } doit))
+ 
+(def doit-validator (validation-set
+                  (presence-of :_id)
+                  (presence-of :title)
+                  (presence-of :created)
+                  (presence-of :modified)))
 
 (defn create-doit
-  "Create a new DoIt"
+  "Insert a DoIt into the database"
   [doit]
-  (let [id (new-uuid)]
-    (dosync
-      (alter doits assoc id (merge doit {:created (time/now)})))
-    id))
-
-(defn query-doits
-  "Return a sequence of DoIts"
-  []
-  (map #(merge (val %) {:id (key %)}) @doits))
-
-(defn get-doit
-  "Get a DoIt by ID"
-  [id]
-  (if (contains? @doits id)
-    (assoc (doits id) :id id)
-    nil))
-
-(defn update-doit
-  "Update a DoIt by ID"
-  [id doit]
-  (if (contains? @doits id)
-    ((dosync
-      (alter doits assoc id 
-        (merge (@doits id) (dissoc doit :id) (dissoc doit :created) {:modified (time/now)}))) id)))
-
-(defn delete-doit
-  "Delete a DoIt"
-  [id]
-  (dosync
-    (alter doits dissoc id)))
+  (let [new-doit (created-now (modified-now (with-oid doit)))
+        validation-errors (doit-validator new-doit)]
+    (if (empty? validation-errors)
+      (do
+        (collection/insert (config :collection) new-doit)
+        (str (new-doit :_id)))
+      (throw (IllegalArgumentException.)))))
