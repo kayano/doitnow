@@ -3,21 +3,13 @@
         doitnow.data)
   (:require [clj-time.core :as time]))
 
-;(defn data-fixture [f]
-;  (dosync
-;    (alter doits assoc (new-uuid)
-;      {:title "Test Doit #1"
-;       :description "A test DoIt"
-;       :created (time/now) 
-;       :due (time/plus (time/now) (time/days 2))})
-;    (alter doits assoc (new-uuid)
-;      {:title "Test Doit #2"
-;       :description "A test DoIt" 
-;       :created (time/now) 
-;       :due (time/plus (time/now) (time/months 3))}))
-;  (f))
-;
-;(use-fixtures :once data-fixture)
+(defn mongo-connection [f]
+  (dosync
+    (alter data-options assoc :db "doitnow-test"))
+  (println "Data Options:" @data-options)
+  (f))
+
+(use-fixtures :once mongo-connection)
 
 (defn- object-id? [id]
   (and
