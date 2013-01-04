@@ -1,12 +1,12 @@
 (ns doitnow.test.data
   (:use clojure.test
-        doitnow.data)
+        doitnow.data
+        [monger.core :only [connect! connect set-db! get-db]])
   (:require [clj-time.core :as time]))
 
 (defn mongo-connection [f]
-  (dosync
-    (alter data-options assoc :db "doitnow-test"))
-  (println "Data Options:" @data-options)
+  (connect! { :host "localhost" :port 27017 })
+  (set-db! (monger.core/get-db "doitnow-test"))
   (f))
 
 (use-fixtures :once mongo-connection)
@@ -20,7 +20,7 @@
 (deftest test-create-doit
   (testing "Create Valid DoIt"
     (let [doit {:title "Newly Created Test DoIt"
-                :description "A test DoIt" 
+                :description "A New Test DoIt" 
                 :due (time/plus (time/now) (time/weeks 2))
                 :priority 1}
           created (create-doit doit)]

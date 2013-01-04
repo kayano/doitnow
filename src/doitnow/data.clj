@@ -11,11 +11,11 @@
             [monger.json]
             [clj-time.core :as time]))
 
-(def data-options (ref
+(def mongo-options (ref
   { :host "localhost" :port 27017 :db "doitnow" :collection "doits" }))
 
-(connect! @data-options)
-(set-db! (monger.core/get-db (@data-options :db)))
+(connect! @mongo-options)
+(set-db! (monger.core/get-db (@mongo-options :db)))
 
 (defn- with-oid
   "Add a new Object ID to a DoIt"
@@ -45,7 +45,7 @@
         validation-errors (doit-validator new-doit)]
     (if (empty? validation-errors)
       (do
-        (collection/insert (@data-options :collection) new-doit)
+        (collection/insert (@mongo-options :collection) new-doit)
         ;; need to add success check
         new-doit)
       (throw (IllegalArgumentException.)))))
