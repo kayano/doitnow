@@ -23,5 +23,4 @@
           headers (response :headers)]
       (is (= (response :status) 201))
       (is (contains? headers "Location"))
-      (is (not (nil? body)))
       (is (map? body)))))

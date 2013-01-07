@@ -29,12 +29,9 @@
         (http/not-implemented))
       ; Create new DoIt
       (POST "/" [:as req]
-        (let [created (create-doit {:title "tester"})
-              location (str (http/url-from req) (created :_id))]
-          (->
-            (response created)
-            (status 201)
-            (header "Location" location))))
+        (let [body (create-doit {:title "tester"})
+              location (http/url-from req (str (body :_id)))]
+          (http/created location body)))
       ; Update an existing DoIt (or create a new one)
       (PUT "/:id" [id]
         (http/not-implemented))
