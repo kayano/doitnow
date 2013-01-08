@@ -1,21 +1,18 @@
 ;; MongoDB Interface
 ;;
 (ns doitnow.data
-  (:use [monger.core :only [connect! connect set-db! get-db]]
+  (:use [monger.core :only [connect! set-db! get-db]]
         [validateur.validation])
   (:require [monger.collection :as collection]
-            [monger.conversion :as conversion]
-            [monger.result :as result]
             [monger.util :as util]
             [monger.joda-time]
-            [monger.json]
             [clj-time.core :as time]))
 
 (def mongo-options (ref
   { :host "localhost" :port 27017 :db "doitnow" :collection "doits" }))
 
 (connect! @mongo-options)
-(set-db! (monger.core/get-db (@mongo-options :db)))
+(set-db! (get-db (@mongo-options :db)))
 
 (defn- with-oid
   "Add a new Object ID to a DoIt"
@@ -33,10 +30,10 @@
   (merge { :modified (time/now) } doit))
  
 (def doit-validator (validation-set
-                  (presence-of :_id)
-                  (presence-of :title)
-                  (presence-of :created)
-                  (presence-of :modified)))
+                      (presence-of :_id)
+                      (presence-of :title)
+                      (presence-of :created)
+                      (presence-of :modified)))
 
 (defn create-doit
   "Insert a DoIt into the database"

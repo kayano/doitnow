@@ -1,8 +1,7 @@
 ;; HTTP Helper Functions
 ;;
 (ns doitnow.http
-  (:use compojure.core
-        ring.util.response
+  (:use ring.util.response
         [clojure.string :only [upper-case join]]))
 
 (defn url-from 
@@ -18,7 +17,7 @@
   ([allowed body]
     (->
       (response body)
-      (header "Allow" (apply str (interpose ", " (map #(upper-case (name %)) allowed)))))))
+      (header "Allow" (join ", " (map #(upper-case (name %)) allowed))))))
 
 (defn method-not-allowed
   "Generate a 405 response with an Allow header containing the provided HTTP method names"
