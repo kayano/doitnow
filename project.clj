@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [compojure "1.1.3"]
                  [ring-middleware-format "0.2.2"]
+                 [ring/ring-json "0.1.2"]
                  [org.clojure/tools.logging "0.2.4"]
                  [log4j/log4j "1.2.17"]
                  [clj-time "0.4.4"]
