@@ -31,7 +31,6 @@
         (http/not-implemented))
       ; Create new DoIt
       (POST "/" [:as req]
-        (println (req :body) (map? (req :body)))
         (let [doit (create-doit (keywordize-keys (req :body)))
               location (http/url-from req (str (doit :_id)))]
           (http/created location doit)))

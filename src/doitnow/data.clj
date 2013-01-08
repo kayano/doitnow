@@ -43,7 +43,6 @@
   [doit]
   (let [new-doit (created-now (modified-now (with-oid doit)))
         validation-errors (doit-validator new-doit)]
-    (println new-doit)
     (if (empty? validation-errors)
       (do
         (collection/insert (@mongo-options :collection) new-doit)

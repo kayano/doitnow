@@ -13,7 +13,7 @@
 
 (defn- object-id? [id]
   (and
-    (not (nil? id))
+    (not (nil? id))''
     (string? id)
     (re-matches #"[0-9a-f]{24}" id)))
 
@@ -25,7 +25,13 @@
                 :priority 1}
           created (create-doit doit)]
       (is (map? created))
-      (is (contains? created :_id))))
+      (is (contains? created :_id))
+      (is (contains? created :title))
+      (is (contains? created :description))
+      (is (contains? created :due))
+      (is (contains? created :priority))
+      (is (contains? created :created))
+      (is (contains? created :modified))))
   (testing "Create Invalid DoIt"
     (is (thrown? IllegalArgumentException (create-doit {})))))
 
