@@ -2,6 +2,7 @@
 ;;
 (ns doitnow.data
   (:use [monger.core :only [connect! set-db! get-db]]
+        [monger.result :only [ok?]]
         [validateur.validation])
   (:require [monger.collection :as collection]
             [monger.util :as util]
@@ -41,8 +42,8 @@
   (let [new-doit (created-now (modified-now (with-oid doit)))
         validation-errors (doit-validator new-doit)]
     (if (empty? validation-errors)
-      (do
-        (collection/insert (@mongo-options :collection) new-doit)
-        ;; need to add success check
-        new-doit)
+      (let [write-result (collection/insert (@mongo-options :collection) new-doit)]
+        (if (ok? write-result)
+          new-doit
+          (throw (Exception. "Write Failed"))))
       (throw (IllegalArgumentException.)))))
