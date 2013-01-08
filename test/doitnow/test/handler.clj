@@ -18,10 +18,15 @@
 
 (deftest test-create-doit
   (testing "Create valid doit"
-    (let [response (api-routes (request :post "/api/doits" {:title "Test DoIt"}))
-          body (response :body)
-          headers (response :headers)]
+    (let [response (api-routes
+                      (-> (request :post "/api/doits")
+                          (assoc :body {:title "Test DoIt"})))
+          response-body (response :body)
+          response-headers (response :headers)]
       (is (= (response :status) 201))
-      (is (contains? headers "Location"))
-      (is (not (nil? body)))
-      (is (map? body)))))
+      (is (contains? response-headers "Location"))
+      (is (map? response-body))
+      (is (contains? response-body :_id))
+      (is (contains? response-body :title))
+      (is (contains? response-body :created))
+      (is (contains? response-body :modified)))))

@@ -3,14 +3,12 @@
 (ns doitnow.http
   (:use compojure.core
         ring.util.response
-        [clojure.string :only [upper-case]]))
+        [clojure.string :only [upper-case join]]))
 
 (defn url-from 
-  "Create a location URL from request data"
-  ([{scheme :scheme server-name :server-name server-port :server-port context :context path-info :path-info}]
-    (url-from scheme server-name server-port context path-info))
-  ([scheme server-name server-port context path-info]
-    (str (name scheme) "://" server-name ":" server-port context path-info)))
+  "Create a location URL from request data and additional path elements"
+  [{scheme :scheme server-name :server-name server-port :server-port uri :uri} & path-elements]
+  (str "http://" server-name ":" server-port  uri "/" (join "/" path-elements)))
 
 (defn options
   "Generate a 200 HTTP response with an Allow header containing the provided
@@ -32,7 +30,7 @@
 (defn no-content?
   "Check for a nil or empty response and set status to 204 (No Content) with nil body"
   [body]
-  (if (or (nil? body) (and (seq? body) (empty? body)))
+  (if (or (nil? body) (empty? body))
     (->
       (response nil)
       (status 204))
@@ -44,3 +42,13 @@
   (->
     (response nil)
     (status 501)))
+
+(defn created
+  "Return an HTTP 201 (Created)"
+  ([location]
+    (created location nil))
+  ([location body]
+    (->
+      (response body)
+      (status 201)
+      (header "Location" location))))

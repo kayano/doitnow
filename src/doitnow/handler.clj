@@ -5,7 +5,9 @@
         ring.util.response
         doitnow.middleware
         doitnow.data
-        [ring.middleware.format-response :only [wrap-restful-response]])
+        [ring.middleware.format-response :only [wrap-restful-response]]
+        [ring.middleware.json :only [wrap-json-body]]
+        [clojure.walk :only [keywordize-keys]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [doitnow.http :as http]))
@@ -29,12 +31,9 @@
         (http/not-implemented))
       ; Create new DoIt
       (POST "/" [:as req]
-        (let [created (create-doit {:title "tester"})
-              location (str (http/url-from req) (created :_id))]
-          (->
-            (response created)
-            (status 201)
-            (header "Location" location))))
+        (let [doit (create-doit (keywordize-keys (req :body)))
+              location (http/url-from req (str (doit :_id)))]
+          (http/created location doit)))
       ; Update an existing DoIt (or create a new one)
       (PUT "/:id" [id]
         (http/not-implemented))
@@ -53,6 +52,7 @@
   "Application entry point & handler chain"
   (->
     (handler/api api-routes)
+    (wrap-json-body)
     (wrap-request-logger)
     (wrap-exception-handler)
     (wrap-response-logger)

@@ -64,7 +64,11 @@
   (fn [req]
     (try
       (handler req)
+      (catch IllegalArgumentException e
+        (->
+          (response e)
+          (status 400)))
       (catch Exception e
         (->
           (response e)
-          (status 500))))))
+          (status 500)))      )))
