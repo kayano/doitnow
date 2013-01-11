@@ -40,11 +40,9 @@
 (defn create-doit
   "Insert a DoIt into the database"
   [doit]
-  (let [new-doit (created-now (modified-now (with-oid doit)))
-        validation-errors (doit-validator new-doit)]
-    (if (empty? validation-errors)
-      (let [write-result (collection/insert (mongo-options :collection) new-doit)]
-        (if (ok? write-result)
-          new-doit
-          (throw (Exception. "Write Failed"))))
-      (throw (IllegalArgumentException.)))))
+  (let [new-doit (created-now (modified-now (with-oid doit)))]
+    (if (valid? doit-validator new-doit)
+      (if (ok? (collection/insert (mongo-options :collection) new-doit))
+        new-doit
+        (throw (Exception. "Write Failed")))
+      (throw (IllegalArgumentException.)))))       
