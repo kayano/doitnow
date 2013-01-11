@@ -62,11 +62,6 @@
       (is (nil? (response :body))))))
 
 (deftest test-http-created
-  (testing "Create with no location"
-    (let [response (created)]
-      (is (= (response :status) 201))
-      (is (not (contains? (response :headers) "Location")))
-      (is (nil? (response :body)))))
   (testing "Create with location"
     (let [response (created (url-from (request :post "/api/doits") "50e64dd544ae5146ffbb8acf"))
           location (get-in response [:headers "Location"])]

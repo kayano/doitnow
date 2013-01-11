@@ -2,6 +2,7 @@
 ;;
 (ns doitnow.http
   (:use ring.util.response
+        ring.util.codec
         [clojure.string :only [upper-case join]]))
 
 (defn url-from 
@@ -47,12 +48,10 @@
 
 (defn created
   "Return an HTTP 201 (Created)"
-  ([]
-    (status (response nil) 201))
-  ([location]
-    (created location nil))
-  ([location body]
+  ([url]
+    (created url nil))
+  ([url body]
     (->
       (response body)
       (status 201)
-      (header "Location" location))))
+      (header "Location" url))))
