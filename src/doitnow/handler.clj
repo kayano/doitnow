@@ -20,30 +20,22 @@
     (ANY "/" [] 
       (http/method-not-allowed [:options]))
     (context "/doits" []
-      ; Query DoIts
       (GET "/" []
         (http/not-implemented))
-      ; Get a DoIt by ID
       (GET "/:id" [id]
         (http/not-implemented))
-      ; Get DoIt metadata by ID
       (HEAD "/:id" [id]
         (http/not-implemented))
-      ; Create new DoIt
       (POST "/" [:as req]
         (let [doit (create-doit (keywordize-keys (req :body)))
               location (http/url-from req (str (doit :_id)))]
           (http/created location doit)))
-      ; Update an existing DoIt (or create a new one)
       (PUT "/:id" [id]
         (http/not-implemented))
-      ; Delete an existing DoIt
       (DELETE "/:id" [id]
         (http/not-implemented))
-      ; Get operation metadata
       (OPTIONS "/" []
         (http/options [:options :get :head :put :post :delete]))
-      ; Default for unimplemented HTTP methods
       (ANY "/" []
         (http/method-not-allowed [:options :get :head :put :post :delete]))))
   (route/not-found "Nothing to see here, move along now"))

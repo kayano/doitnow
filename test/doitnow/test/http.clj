@@ -22,29 +22,25 @@
     (let [response (options)]
       (is (= (response :status) 200))
       (is (nil? (response :body)))
-      (is (contains? (response :headers) "Allow"))
-      (is (= ((response :headers) "Allow") "OPTIONS"))))
+      (is (= (get-in response [:headers "Allow"] "OPTIONS")))))
   (testing "HTTP Options With-Allowed Response"
     (let [response (options [:get :post])]
       (is (= (response :status) 200))
       (is (nil? (response :body)))
-      (is (contains? (response :headers) "Allow"))
-      (is (= ((response :headers) "Allow") "GET, POST"))))
+      (is (= (get-in response [:headers "Allow"] "GET, POST")))))
   (testing "HTTP Options With-Body Response"
     (let [response (options [:get :post] {:version "version-number"})]
       (is (= (response :status) 200))
       (is (map? (response :body)))
       (is (contains? (response :body) :version))
-      (is (contains? (response :headers) "Allow"))
-      (is (= ((response :headers) "Allow") "GET, POST")))))
+      (is (= (get-in response [:headers "Allow"] "GET, POST"))))))
 
 (deftest test-http-method-not-allowed
   (testing "HTTP Method Not Allowed With-Options"
     (let [response (method-not-allowed [:options :get])]
       (is (= (response :status) 405))
       (is (nil? (response :body)))
-      (is (contains? (response :headers) "Allow"))
-      (is (= ((response :headers) "Allow") "OPTIONS, GET")))))
+      (is (= (get-in response [:headers "Allow"] "OPTIONS, GET"))))))
 
 (deftest test-http-no-content?
   (testing "HTTP No-Content nil body"
@@ -66,14 +62,20 @@
       (is (nil? (response :body))))))
 
 (deftest test-http-created
+  (testing "Create with no location"
+    (let [response (created)]
+      (is (= (response :status) 201))
+      (is (not (contains? (response :headers) "Location")))
+      (is (nil? (response :body)))))
   (testing "Create with location"
     (let [response (created (url-from (request :post "/api/doits") "50e64dd544ae5146ffbb8acf"))
-          location ((response :headers) "Location")]
+          location (get-in response [:headers "Location"])]
       (is (= (response :status) 201))
-      (is (= location "http://localhost:80/api/doits/50e64dd544ae5146ffbb8acf"))))
+      (is (= location "http://localhost:80/api/doits/50e64dd544ae5146ffbb8acf"))
+      (is (nil? (response :body)))))
   (testing "Create with location & body"
     (let [response (created (url-from (request :post "/api/doits") "50e64dd544ae5146ffbb8acf") {:title "test"})
-          location ((response :headers) "Location")
+          location (get-in response [:headers "Location"])
           body (response :body)]
       (is (= (response :status) 201))
       (is (= location "http://localhost:80/api/doits/50e64dd544ae5146ffbb8acf"))

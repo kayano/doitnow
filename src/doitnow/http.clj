@@ -6,8 +6,9 @@
 
 (defn url-from 
   "Create a location URL from request data and additional path elements"
-  [{scheme :scheme server-name :server-name server-port :server-port uri :uri} & path-elements]
-  (str "http://" server-name ":" server-port  uri "/" (join "/" path-elements)))
+  [{scheme :scheme server-name :server-name server-port :server-port uri :uri}
+    & path-elements]
+    (str "http://" server-name ":" server-port  uri "/" (join "/" path-elements)))
 
 (defn options
   "Generate a 200 HTTP response with an Allow header containing the provided
@@ -17,17 +18,19 @@
   ([allowed body]
     (->
       (response body)
-      (header "Allow" (join ", " (map #(upper-case (name %)) allowed))))))
+      (header "Allow" (join ", " (map (comp upper-case name) allowed))))))
 
 (defn method-not-allowed
-  "Generate a 405 response with an Allow header containing the provided HTTP method names"
+  "Generate a 405 response with an Allow header containing the provided HTTP
+  method names"
   [allowed]
     (->
       (options allowed)
       (status 405)))
 
 (defn no-content?
-  "Check for a nil or empty response and set status to 204 (No Content) with nil body"
+  "Check for a nil or empty response and set status to 204 (No Content) with
+  nil body"
   [body]
   (if (or (nil? body) (empty? body))
     (->
@@ -44,6 +47,8 @@
 
 (defn created
   "Return an HTTP 201 (Created)"
+  ([]
+    (status (response nil) 201))
   ([location]
     (created location nil))
   ([location body]

@@ -7,28 +7,29 @@
   (:require [monger.collection :as collection]
             [monger.util :as util]
             [monger.joda-time]
+            [monger.json]
             [clj-time.core :as time]))
 
-(def mongo-options (ref
-  { :host "localhost" :port 27017 :db "doitnow" :collection "doits" }))
+(def mongo-options
+  {:host "localhost" :port 27017 :db "doitnow" :collection "doits"})
 
-(connect! @mongo-options)
-(set-db! (get-db (@mongo-options :db)))
+(connect! mongo-options)
+(set-db! (get-db (mongo-options :db)))
 
 (defn- with-oid
   "Add a new Object ID to a DoIt"
   [doit]
-  (merge { :_id (util/object-id) } doit))
+  (assoc doit :_id (util/object-id)))
 
 (defn- created-now
   "Set the created time in a DoIt to the current time"
   [doit]
-  (merge { :created (time/now) } doit))
+  (assoc doit :created (time/now)))
 
 (defn- modified-now
   "Set the modified time in a DoIt to the current time"
   [doit]
-  (merge { :modified (time/now) } doit))
+  (assoc doit :modified (time/now)))
  
 (def doit-validator (validation-set
                       (presence-of :_id)
@@ -42,7 +43,7 @@
   (let [new-doit (created-now (modified-now (with-oid doit)))
         validation-errors (doit-validator new-doit)]
     (if (empty? validation-errors)
-      (let [write-result (collection/insert (@mongo-options :collection) new-doit)]
+      (let [write-result (collection/insert (mongo-options :collection) new-doit)]
         (if (ok? write-result)
           new-doit
           (throw (Exception. "Write Failed"))))
