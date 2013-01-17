@@ -58,8 +58,8 @@
       response)))
 
 (defn wrap-exception-handler
-  "Ring middleware function to trap any uncaught exceptions and return a standard 500
-  response with the exception instance as the response body"
+  "Ring middleware function to trap any uncaught exceptions and return an appropriate
+  status code with the exception instance as the response body"
   [handler]
   (fn [req]
     (try

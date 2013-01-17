@@ -12,7 +12,8 @@
                  [clj-time "0.4.4"]
                  [com.novemberain/monger "1.3.4"]
                  [com.novemberain/validateur "1.2.0"]]
-  :plugins [[lein-ring "0.7.5"]]
+  :plugins [[lein-ring "0.7.5"]
+            [lein-kibit "0.0.7"]]
   :ring {:handler doitnow.handler/app}
   :profiles
     {:dev

@@ -2,7 +2,6 @@
 ;;
 (ns doitnow.http
   (:use ring.util.response
-        ring.util.codec
         [clojure.string :only [upper-case join]]))
 
 (defn url-from 

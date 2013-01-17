@@ -11,7 +11,10 @@
             [clj-time.core :as time]))
 
 (def mongo-options
-  {:host "localhost" :port 27017 :db "doitnow" :collection "doits"})
+  {:host "localhost"
+   :port 27017
+   :db "doitnow"
+   :doits-collection "doits"})
 
 (connect! mongo-options)
 (set-db! (get-db (mongo-options :db)))
@@ -42,7 +45,7 @@
   [doit]
   (let [new-doit (created-now (modified-now (with-oid doit)))]
     (if (valid? doit-validator new-doit)
-      (if (ok? (collection/insert (mongo-options :collection) new-doit))
+      (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
         new-doit
         (throw (Exception. "Write Failed")))
       (throw (IllegalArgumentException.)))))       
