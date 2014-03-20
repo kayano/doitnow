@@ -2,7 +2,8 @@
 ;;
 
 (ns doitnow.middleware
-  (:require [cheshire.custom :refer [JSONable]]
+  (:require [cheshire.core :refer :all]
+            [cheshire.generate :refer [add-encoder encode-str remove-encoder]]
             [clj-time.format :as format]
             [clojure.string :refer [upper-case]]
             [ring.util.response :refer [response status]]
@@ -14,26 +15,23 @@
 ;; See https://github.com/dakrone/cheshire
 ;;
 
-(extend java.lang.Exception
-  JSONable
-  {:to-json (fn [^Exception e ^JsonGenerator jg]
-              (.writeStartObject jg)
-              (.writeFieldName jg "exception")
-              (.writeString jg (.getName (class e)))
-              (.writeFieldName jg "message")
-              (.writeString jg (.getMessage e))
-              (.writeEndObject jg))})
+(add-encoder java.lang.Exception
+             (fn [^Exception e ^JsonGenerator jg]
+               (.writeStartObject jg)
+               (.writeFieldName jg "exception")
+               (.writeString jg (.getName (class e)))
+               (.writeFieldName jg "message")
+               (.writeString jg (.getMessage e))
+               (.writeEndObject jg)))
 
-(extend org.joda.time.DateTime
-  JSONable
-  {:to-json (fn [^org.joda.time.DateTime dt ^JsonGenerator jg]
-              (.writeString jg (format/unparse
-                                (format/formatters :date-time-no-ms) dt)))})
+(add-encoder org.joda.time.DateTime
+             (fn [^org.joda.time.DateTime dt ^JsonGenerator jg]
+               (.writeString jg (format/unparse
+                                 (format/formatters :date-time-no-ms) dt))))
 
-(extend org.bson.types.ObjectId
-  JSONable
-  {:to-json (fn [^org.bson.types.ObjectId id ^JsonGenerator jg]
-              (.writeString jg (.toString id)))})
+(add-encoder org.bson.types.ObjectId
+             (fn [^org.bson.types.ObjectId id ^JsonGenerator jg]
+               (.writeString jg (.toString id))))
 
 ;;
 ;; Middleware Handlers
