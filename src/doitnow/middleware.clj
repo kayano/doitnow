@@ -5,8 +5,8 @@
   (:require [cheshire.custom :refer [JSONable]]
             [clj-time.format :as format]
             [clojure.string :refer [upper-case]]
-            [clojure.tools.logging :as log]
-            [ring.util.response :refer [response status]])
+            [ring.util.response :refer [response status]]
+            [taoensso.timbre :refer [debug warn]])
   (:import (com.fasterxml.jackson.core JsonGenerator)))
 
 ;;
@@ -30,6 +30,11 @@
               (.writeString jg (format/unparse
                                 (format/formatters :date-time-no-ms) dt)))})
 
+(extend org.bson.types.ObjectId
+  JSONable
+  {:to-json (fn [^org.bson.types.ObjectId id ^JsonGenerator jg]
+              (.writeString jg (.toString id)))})
+
 ;;
 ;; Middleware Handlers
 ;;
@@ -40,7 +45,7 @@
   [handler]
   (fn [req]
     (let [{remote-addr :remote-addr request-method :request-method uri :uri} req]
-      (log/debug remote-addr (upper-case (name request-method)) uri)
+      (debug remote-addr (upper-case (name request-method)) uri)
       (handler req))))
 
 (defn wrap-response-logger
@@ -52,8 +57,8 @@
           {remote-addr :remote-addr request-method :request-method uri :uri} req
           {status :status body :body} response]
       (if (instance? Exception body)
-        (log/warn body remote-addr (upper-case (name request-method)) uri "->" status body)
-        (log/debug remote-addr (upper-case (name request-method)) uri "->" status))
+        (warn body remote-addr (upper-case (name request-method)) uri "->" status body)
+        (debug remote-addr (upper-case (name request-method)) uri "->" status))
       response)))
 
 (defn wrap-exception-handler
