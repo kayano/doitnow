@@ -24,7 +24,7 @@
           response-body (response :body)
           response-headers (response :headers)]
       (is (= (response :status) 201))
-      (is (contains? response-headers "Location"))
+      (is (contains? response-headers "location"))
       (is (map? response-body))
       (is (contains? response-body :_id))
       (is (contains? response-body :title))
