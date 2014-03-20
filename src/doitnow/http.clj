@@ -2,8 +2,7 @@
 ;;
 
 (ns doitnow.http
-  (:require [clojure.set :refer [join]]
-            [clojure.string :refer [upper-case]]
+  (:require [clojure.string :refer [upper-case join]]
             [ring.mock.request :refer [header]]
             [ring.util.response :refer [response status]]))
 
