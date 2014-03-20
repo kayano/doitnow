@@ -1,4 +1,4 @@
-(defproject doitnow "0.4.0-SNAPSHOT"
+(defproject doitnow "0.5.0-SNAPSHOT"
   :description "Sample project for blog article: Building A Clojure REST Service"
   :url "https://github.com/3rddog/doitnow"
   :license {:name "Eclipse Public License"
