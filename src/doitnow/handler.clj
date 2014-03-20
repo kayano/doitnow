@@ -1,16 +1,26 @@
 ;; Main HTTP Request Handler
 ;;
+
 (ns doitnow.handler
-  (:use compojure.core
-        ring.util.response
-        doitnow.middleware
-        doitnow.data
-        [ring.middleware.format-response :only [wrap-restful-response]]
-        [ring.middleware.json :only [wrap-json-body]]
-        [clojure.walk :only [keywordize-keys]])
-  (:require [compojure.handler :as handler]
+  (:require [clojure.walk :refer [keywordize-keys]]
+            [compojure.core :refer [ANY
+                                    DELETE
+                                    GET
+                                    HEAD
+                                    OPTIONS
+                                    POST
+                                    PUT
+                                    context
+                                    defroutes]]
+            [compojure.handler :as handler]
             [compojure.route :as route]
-            [doitnow.http :as http]))
+            [doitnow.data :refer [create-doit]]
+            [doitnow.http :as http]
+            [doitnow.middleware :refer [wrap-exception-handler
+                                        wrap-request-logger
+                                        wrap-response-logger]]
+            [ring.middleware.format-response :refer [wrap-restful-response]]
+            [ring.middleware.json :refer [wrap-json-body]]))
 
 (defroutes api-routes
   "Main client API route definitions"

@@ -1,7 +1,7 @@
 (ns doitnow.test.handler
-  (:use clojure.test
-        ring.mock.request  
-        doitnow.handler))
+  (:require [clojure.test :refer :all]
+            [doitnow.handler :refer :all]
+            [ring.mock.request :refer :all]))
 
 (deftest test-api-routes
   (testing "API Options"

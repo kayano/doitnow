@@ -1,14 +1,14 @@
 ;; MongoDB Interface
 ;;
+
 (ns doitnow.data
-  (:use [monger.core :only [connect! set-db! get-db]]
-        [monger.result :only [ok?]]
-        [validateur.validation])
-  (:require [monger.collection :as collection]
+  (:require [clj-time.core :as time]
+            [monger.collection :as collection]
+            [monger.core :refer [connect! get-db set-db!]]
+            [monger.result :refer [ok?]]
             [monger.util :as util]
-            [monger.joda-time]
-            [monger.json]
-            [clj-time.core :as time]))
+            [validateur.validation :refer [presence-of
+                                           valid? validation-set]]))
 
 (def mongo-options
   {:host "localhost"

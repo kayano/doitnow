@@ -1,7 +1,7 @@
 (ns doitnow.test.http
-  (:use clojure.test
-        ring.mock.request  
-        doitnow.http))
+  (:require [clojure.test :refer :all]
+            [doitnow.http :refer :all]
+            [ring.mock.request :refer :all]))
 
 (deftest test-url-from
   (testing "Create basic URL"

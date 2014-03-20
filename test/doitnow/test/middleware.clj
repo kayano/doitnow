@@ -1,7 +1,7 @@
 (ns doitnow.test.middleware
-  (:use clojure.test
-        ring.mock.request  
-        doitnow.middleware))
+  (:require [clojure.test :refer :all]
+            [doitnow.middleware :refer :all]
+            [ring.mock.request :refer :all]))
 
 (deftest test-wrap-exception-handler
   (testing "Exception Handling"

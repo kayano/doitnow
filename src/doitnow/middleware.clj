@@ -1,13 +1,12 @@
 ;; Ring Middleware & Utility Functions
 ;;
+
 (ns doitnow.middleware
-  (:use compojure.core
-        ring.util.response
-        [clojure.string :only [upper-case]]
-        [cheshire.custom :only [JSONable]])
-  (:require [clojure.tools.logging :as log]
-            [clj-time.core :as time]
-            [clj-time.format :as format])
+  (:require [cheshire.custom :refer [JSONable]]
+            [clj-time.format :as format]
+            [clojure.string :refer [upper-case]]
+            [clojure.tools.logging :as log]
+            [ring.util.response :refer [response status]])
   (:import (com.fasterxml.jackson.core JsonGenerator)))
 
 ;;

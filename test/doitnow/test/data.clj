@@ -1,8 +1,8 @@
 (ns doitnow.test.data
-  (:use clojure.test
-        doitnow.data
-        [monger.core :only [connect! connect set-db! get-db]])
-  (:require [clj-time.core :as time]))
+  (:require [clj-time.core :as time]
+            [clojure.test :refer :all]
+            [doitnow.data :refer :all]
+            [monger.core :refer [connect! set-db!]]))
 
 (defn mongo-connection [f]
   (connect! { :host "localhost" :port 27017 })

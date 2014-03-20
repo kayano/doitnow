@@ -1,8 +1,11 @@
 ;; HTTP Helper Functions
 ;;
+
 (ns doitnow.http
-  (:use ring.util.response
-        [clojure.string :only [upper-case join]]))
+  (:require [clojure.set :refer [join]]
+            [clojure.string :refer [upper-case]]
+            [ring.mock.request :refer [header]]
+            [ring.util.response :refer [response status]]))
 
 (defn url-from
   "Create a location URL from request data and additional path elements"
