@@ -33,12 +33,12 @@
   "Set the modified time in a DoIt to the current time"
   [doit]
   (assoc doit :modified (time/now)))
- 
+
 (def doit-validator (validation-set
-                      (presence-of :_id)
-                      (presence-of :title)
-                      (presence-of :created)
-                      (presence-of :modified)))
+                     (presence-of :_id)
+                     (presence-of :title)
+                     (presence-of :created)
+                     (presence-of :modified)))
 
 (defn create-doit
   "Insert a DoIt into the database"
@@ -48,4 +48,4 @@
       (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
         new-doit
         (throw (Exception. "Write Failed")))
-      (throw (IllegalArgumentException.)))))       
+      (throw (IllegalArgumentException.)))))

@@ -18,18 +18,18 @@
 (extend java.lang.Exception
   JSONable
   {:to-json (fn [^Exception e ^JsonGenerator jg]
-    (.writeStartObject jg)
-    (.writeFieldName jg "exception")
-    (.writeString jg (.getName (class e)))
-    (.writeFieldName jg "message")
-    (.writeString jg (.getMessage e))
-    (.writeEndObject jg))})
+              (.writeStartObject jg)
+              (.writeFieldName jg "exception")
+              (.writeString jg (.getName (class e)))
+              (.writeFieldName jg "message")
+              (.writeString jg (.getMessage e))
+              (.writeEndObject jg))})
 
 (extend org.joda.time.DateTime
   JSONable
   {:to-json (fn [^org.joda.time.DateTime dt ^JsonGenerator jg]
-    (.writeString jg (format/unparse
-                       (format/formatters :date-time-no-ms) dt)))})
+              (.writeString jg (format/unparse
+                                (format/formatters :date-time-no-ms) dt)))})
 
 ;;
 ;; Middleware Handlers
@@ -66,9 +66,9 @@
       (handler req)
       (catch IllegalArgumentException e
         (->
-          (response e)
-          (status 400)))
+         (response e)
+         (status 400)))
       (catch Exception e
         (->
-          (response e)
-          (status 500))))))
+         (response e)
+         (status 500))))))
