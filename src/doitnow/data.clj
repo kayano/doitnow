@@ -7,6 +7,7 @@
             [monger.core :refer [connect! get-db set-db!]]
             [monger.result :refer [ok?]]
             [monger.util :as util]
+            [monger.joda-time]
             [validateur.validation :refer [presence-of
                                            valid? validation-set]]))
 
