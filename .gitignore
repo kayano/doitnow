@@ -10,3 +10,4 @@ pom.xml
 .lein-plugins
 doc/
 doitnow.sublime-*
+/*.lein-repl-history

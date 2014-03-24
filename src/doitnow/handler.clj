@@ -14,7 +14,7 @@
                                     defroutes]]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [doitnow.data :refer [create-doit]]
+            [doitnow.data :refer [create-doit get-doit]]
             [doitnow.http :as http]
             [doitnow.middleware :refer [wrap-exception-handler
                                         wrap-request-logger
@@ -33,7 +33,7 @@
                     (GET "/" []
                          (http/not-implemented))
                     (GET "/:id" [id]
-                         (http/not-implemented))
+                         (get-doit id))
                     (HEAD "/:id" [id]
                           (http/not-implemented))
                     (POST "/" [:as req]

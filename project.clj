@@ -10,7 +10,8 @@
                  [com.taoensso/timbre "3.1.6"]
                  [clj-time "0.6.0"]
                  [com.novemberain/monger "1.7.0"]
-                 [com.novemberain/validateur "1.7.0"]]
+                 [com.novemberain/validateur "1.7.0"]
+                 [slingshot "0.10.3"]]
   :plugins [[lein-ring "0.8.7"]
             [lein-kibit "0.0.8"]]
   :ring {:handler doitnow.handler/app}

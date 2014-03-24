@@ -9,7 +9,13 @@
             [monger.util :as util]
             [monger.joda-time]
             [validateur.validation :refer [presence-of
-                                           valid? validation-set]]))
+                                           valid? validation-set]]
+            [slingshot.slingshot :refer [throw+]])
+  (:import org.bson.types.ObjectId))
+
+;;
+;; Database Connection Details
+;;
 
 (def mongo-options
   {:host "localhost"
@@ -19,6 +25,16 @@
 
 (connect! mongo-options)
 (set-db! (get-db (mongo-options :db)))
+
+;;
+;; Utility Functions
+;;
+
+(defn- object-id? [id]
+  (and
+   (not (nil? id))
+   (string? id)
+   (re-matches #"[0-9a-f]{24}" id)))
 
 (defn- with-oid
   "Add a new Object ID to a DoIt"
@@ -41,6 +57,10 @@
                      (presence-of :created)
                      (presence-of :modified)))
 
+;;
+;; DB Access Functions
+;;
+
 (defn create-doit
   "Insert a DoIt into the database"
   [doit]
@@ -48,5 +68,16 @@
     (if (valid? doit-validator new-doit)
       (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
         new-doit
-        (throw (Exception. "Write Failed")))
-      (throw (IllegalArgumentException.)))))
+        (throw+ {:type ::failed} "Create Failed"))
+      (throw+ {:type ::invalid} "Invalid DoIt"))))
+
+(defn get-doit
+  "Fetch a DoIt by ID"
+  [id]
+  (if (object-id? id)
+    (let [doit (collection/find-one-as-map
+                (mongo-options :doits-collection) { :_id (ObjectId. id) })]
+      (if (nil? doit)
+        (throw+ {:type ::not-found} (str id " not found"))
+        doit))
+    (throw+ {:type ::invalid} "Invalid DoIt ID")))

@@ -7,7 +7,8 @@
             [clj-time.format :as format]
             [clojure.string :refer [upper-case]]
             [ring.util.response :refer [response status]]
-            [taoensso.timbre :refer [debug warn]])
+            [taoensso.timbre :refer [debug warn]]
+            [slingshot.slingshot :refer [try+]])
   (:import (com.fasterxml.jackson.core JsonGenerator)))
 
 ;;
@@ -64,13 +65,17 @@
   status code with the exception instance as the response body"
   [handler]
   (fn [req]
-    (try
-      (handler req)
-      (catch IllegalArgumentException e
-        (->
-         (response e)
-         (status 400)))
-      (catch Exception e
-        (->
-         (response e)
-         (status 500))))))
+    (try+
+     (handler req)
+     (catch [:type :doitnow.data/invalid] _
+       (->
+        (response (&throw-context :message))
+        (status 400)))
+     (catch [:type :doitnow.data/not-found] _
+       (->
+        (response (&throw-context :message))
+        (status 404)))
+     (catch Object _
+       (->
+        (response (&throw-context :message))
+        (status 500))))))
