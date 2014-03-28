@@ -57,6 +57,20 @@
                      (presence-of :created)
                      (presence-of :modified)))
 
+(defn- with-id
+  ""
+  [id operation]
+  (if (object-id? id)
+    (operation)
+    (throw+ {:type ::invalid} "Invalid DoIt ID")))
+
+(defn- with-doit
+  ""
+  [doit operation]
+  (if (valid? doit-validator doit)
+    (operation)
+    (throw+ {:type ::invalid} "Invalid DoIt")))
+
 ;;
 ;; DB Access Functions
 ;;
@@ -65,19 +79,26 @@
   "Insert a DoIt into the database"
   [doit]
   (let [new-doit (created-now (modified-now (with-oid doit)))]
-    (if (valid? doit-validator new-doit)
-      (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
-        new-doit
-        (throw+ {:type ::failed} "Create Failed"))
-      (throw+ {:type ::invalid} "Invalid DoIt"))))
+    (with-doit new-doit (fn []
+                          (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
+                            new-doit
+                            (throw+ {:type ::failed} "Create Failed"))))))
 
 (defn get-doit
   "Fetch a DoIt by ID"
   [id]
-  (if (object-id? id)
-    (let [doit (collection/find-one-as-map
-                (mongo-options :doits-collection) { :_id (ObjectId. id) })]
-      (if (nil? doit)
-        (throw+ {:type ::not-found} (str id " not found"))
-        doit))
-    (throw+ {:type ::invalid} "Invalid DoIt ID")))
+  (with-id id (fn []
+                (let [doit (collection/find-one-as-map
+                            (mongo-options :doits-collection) { :_id (ObjectId. id) })]
+                  (if (nil? doit)
+                    (throw+ {:type ::not-found} (str id " not found"))
+                    doit)))))
+
+(defn delete-doit
+  "Delete a DoIt by ID"
+  [id]
+  (with-id id (fn []
+                (if (ok? (collection/remove-by-id
+                          (mongo-options :doits-collection) { :_id (ObjectId. id) }))
+                  nil
+                  (throw+ {:type ::failed} "Delete Failed")))))

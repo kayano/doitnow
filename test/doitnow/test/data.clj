@@ -43,3 +43,11 @@
     (is (thrown+? [:type :doitnow.data/invalid] (get-doit "123456789"))))
   (testing "Get non-existent DoIt"
     (is (thrown+? [:type :doitnow.data/not-found] (get-doit "532d14c35f6cacc494ee47bc")))))
+
+(deftest test-delete-doit
+  (testing "Delete doit"
+    (let [created (create-doit {:title "Delete Test DoIt"})
+          deleted (delete-doit (.toString (created :_id)))]
+      (is (nil? deleted))))
+  (testing "Delete with invalid ID"
+    (is (thrown+? [:type :doitnow.data/invalid] (delete-doit "123456789")))))
