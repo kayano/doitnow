@@ -12,6 +12,16 @@
 
 (use-fixtures :once mongo-connection)
 
+(deftest test-validation
+  (testing "Valid DoIt ID"
+    (is (nil? (validate ["532d14c35f6cacc494ee47bc" :id]))))
+  (testing "Invalid DoIt ID"
+    (is (thrown+? [:type :doitnow.data/invalid] (validate ["123456789" :id]))))
+  (testing "Valid DoIt"
+    (is (nil? (validate [(created-now (modified-now (with-oid {:title "Testing, 123"}))) :doit]))))
+  (testing "Invalid DoIt"
+    (is (thrown+? [:type :doitnow.data/invalid] (validate [{:title "Testing, 123"} :doit])))))
+
 (deftest test-create-doit
   (testing "Create Valid DoIt"
     (let [doit {:title "Newly Created Test DoIt"
@@ -34,7 +44,6 @@
   (testing "Get valid doit"
     (let [created (create-doit {:title "Get Test DoIt"})
           doit (get-doit (.toString (created :_id)))]
-      (is (map? doit))
       (is (contains? created :_id))
       (is (contains? created :title))
       (is (contains? created :created))

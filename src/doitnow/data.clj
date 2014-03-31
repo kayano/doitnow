@@ -30,46 +30,52 @@
 ;; Utility Functions
 ;;
 
-(defn- object-id? [id]
-  (and
-   (not (nil? id))
-   (string? id)
-   (re-matches #"[0-9a-f]{24}" id)))
-
-(defn- with-oid
+(defn with-oid
   "Add a new Object ID to a DoIt"
   [doit]
   (assoc doit :_id (util/object-id)))
 
-(defn- created-now
+(defn created-now
   "Set the created time in a DoIt to the current time"
   [doit]
   (assoc doit :created (time/now)))
 
-(defn- modified-now
+(defn modified-now
   "Set the modified time in a DoIt to the current time"
   [doit]
   (assoc doit :modified (time/now)))
 
-(def doit-validator (validation-set
-                     (presence-of :_id)
-                     (presence-of :title)
-                     (presence-of :created)
-                     (presence-of :modified)))
+;;
+;; Validation Functions
+;;
 
-(defn- with-id
-  ""
-  [id operation]
-  (if (object-id? id)
-    (operation)
-    (throw+ {:type ::invalid} "Invalid DoIt ID")))
+(defmacro assert*
+  "Execute a test, if failed throw an ::invalid exception"
+  [val test]
+  `(if-not ~test
+     (throw+ {:type ::invalid})))
 
-(defn- with-doit
-  ""
-  [doit operation]
-  (if (valid? doit-validator doit)
-    (operation)
-    (throw+ {:type ::invalid} "Invalid DoIt")))
+(defmulti validate* (fn [val test] test))
+
+(defmethod validate* :id
+  [id _]
+  (assert* id (and
+               (not (nil? id))
+               (string? id)
+               (re-matches #"[0-9a-f]{24}" id))))
+
+(defmethod validate* :doit
+  [doit _]
+  (assert* doit (valid? (validation-set
+                         (presence-of :_id)
+                         (presence-of :title)
+                         (presence-of :created)
+                         (presence-of :modified)) doit)))
+
+(defn validate
+  "Execute a sequence of validation tests"
+  [& tests]
+  (doseq [test tests] (apply validate* test)))
 
 ;;
 ;; DB Access Functions
@@ -79,26 +85,24 @@
   "Insert a DoIt into the database"
   [doit]
   (let [new-doit (created-now (modified-now (with-oid doit)))]
-    (with-doit new-doit (fn []
-                          (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
-                            new-doit
-                            (throw+ {:type ::failed} "Create Failed"))))))
+    (validate [new-doit :doit])
+    (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
+      new-doit
+      (throw+ {:type ::failed} "Create Failed"))))
 
 (defn get-doit
   "Fetch a DoIt by ID"
   [id]
-  (with-id id (fn []
-                (let [doit (collection/find-one-as-map
-                            (mongo-options :doits-collection) { :_id (ObjectId. id) })]
-                  (if (nil? doit)
-                    (throw+ {:type ::not-found} (str id " not found"))
-                    doit)))))
+  (validate [id :id])
+  (let [doit (collection/find-by-id (mongo-options :doits-collection) (ObjectId. id))]
+    (if (nil? doit)
+      (throw+ {:type ::not-found} (str id " not found"))
+      doit)))
 
 (defn delete-doit
   "Delete a DoIt by ID"
   [id]
-  (with-id id (fn []
-                (if (ok? (collection/remove-by-id
-                          (mongo-options :doits-collection) { :_id (ObjectId. id) }))
-                  nil
-                  (throw+ {:type ::failed} "Delete Failed")))))
+  (validate [id :id])
+  (if (ok? (collection/remove-by-id (mongo-options :doits-collection) (ObjectId. id)))
+    nil
+    (throw+ {:type ::failed} "Delete Failed")))
