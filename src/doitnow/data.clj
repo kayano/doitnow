@@ -47,6 +47,7 @@
 
 ;;
 ;; Validation Functions
+;; (Inspired by http://stackoverflow.com/questions/1640311/should-i-use-a-function-or-a-macro-to-validate-arguments-in-clojure)
 ;;
 
 (defmacro assert*
