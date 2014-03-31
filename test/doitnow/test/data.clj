@@ -14,13 +14,13 @@
 
 (deftest test-validation
   (testing "Valid DoIt ID"
-    (is (nil? (validate ["532d14c35f6cacc494ee47bc" :id]))))
+    (is (nil? (validate ["532d14c35f6cacc494ee47bc" :ObjectId]))))
   (testing "Invalid DoIt ID"
-    (is (thrown+? [:type :doitnow.data/invalid] (validate ["123456789" :id]))))
+    (is (thrown+? [:type :doitnow.data/invalid] (validate ["123456789" :ObjectId]))))
   (testing "Valid DoIt"
-    (is (nil? (validate [(created-now (modified-now (with-oid {:title "Testing, 123"}))) :doit]))))
+    (is (nil? (validate [(created-now (modified-now (with-oid {:title "Testing, 123"}))) :DoIt]))))
   (testing "Invalid DoIt"
-    (is (thrown+? [:type :doitnow.data/invalid] (validate [{:title "Testing, 123"} :doit])))))
+    (is (thrown+? [:type :doitnow.data/invalid] (validate [{:title "Testing, 123"} :DoIt])))))
 
 (deftest test-create-doit
   (testing "Create Valid DoIt"

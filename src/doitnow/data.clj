@@ -58,14 +58,14 @@
 
 (defmulti validate* (fn [val test] test))
 
-(defmethod validate* :id
+(defmethod validate* :ObjectId
   [id _]
   (assert* id (and
                (not (nil? id))
                (string? id)
                (re-matches #"[0-9a-f]{24}" id))))
 
-(defmethod validate* :doit
+(defmethod validate* :DoIt
   [doit _]
   (assert* doit (valid? (validation-set
                          (presence-of :_id)
@@ -86,7 +86,7 @@
   "Insert a DoIt into the database"
   [doit]
   (let [new-doit (created-now (modified-now (with-oid doit)))]
-    (validate [new-doit :doit])
+    (validate [new-doit :DoIt])
     (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
       new-doit
       (throw+ {:type ::failed} "Create Failed"))))
@@ -94,7 +94,7 @@
 (defn get-doit
   "Fetch a DoIt by ID"
   [id]
-  (validate [id :id])
+  (validate [id :ObjectId])
   (let [doit (collection/find-by-id (mongo-options :doits-collection) (ObjectId. id))]
     (if (nil? doit)
       (throw+ {:type ::not-found} (str id " not found"))
@@ -103,7 +103,7 @@
 (defn delete-doit
   "Delete a DoIt by ID"
   [id]
-  (validate [id :id])
+  (validate [id :ObjectId])
   (if (ok? (collection/remove-by-id (mongo-options :doits-collection) (ObjectId. id)))
     nil
     (throw+ {:type ::failed} "Delete Failed")))
