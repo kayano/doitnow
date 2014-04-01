@@ -58,7 +58,7 @@
            (not (nil? id))
            (string? id)
            (re-matches #"[0-9a-f]{24}" id))
-    (throw+ {:type ::invalid})))
+    (throw+ {:type ::invalid} "Invalid ID")))
 
 (defmethod validate* :DoIt
   [doit _]
@@ -67,7 +67,7 @@
                    (presence-of :title)
                    (presence-of :created)
                    (presence-of :modified)) doit)
-    (throw+ {:type ::invalid})))
+    (throw+ {:type ::invalid} "Invalid DoIt")))
 
 (defn validate
   "Execute a sequence of validation tests"
