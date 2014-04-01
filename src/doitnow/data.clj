@@ -50,9 +50,9 @@
 ;; (Inspired by http://stackoverflow.com/questions/1640311/should-i-use-a-function-or-a-macro-to-validate-arguments-in-clojure)
 ;;
 
-(defmulti validate* (fn [val test] test))
+(defmulti validate* (fn [val val-type] val-type))
 
-(defmethod validate* :ObjectId
+(defmethod validate* ::ObjectId
   [id _]
   (if-not (and
            (not (nil? id))
@@ -60,7 +60,7 @@
            (re-matches #"[0-9a-f]{24}" id))
     (throw+ {:type ::invalid} "Invalid ID")))
 
-(defmethod validate* :DoIt
+(defmethod validate* ::DoIt
   [doit _]
   (if-not (valid? (validation-set
                    (presence-of :_id)
@@ -82,7 +82,7 @@
   "Insert a DoIt into the database"
   [doit]
   (let [new-doit (created-now (modified-now (with-oid doit)))]
-    (validate [new-doit :DoIt])
+    (validate [new-doit ::DoIt])
     (if (ok? (collection/insert (mongo-options :doits-collection) new-doit))
       new-doit
       (throw+ {:type ::failed} "Create Failed"))))
@@ -90,7 +90,7 @@
 (defn get-doit
   "Fetch a DoIt by ID"
   [id]
-  (validate [id :ObjectId])
+  (validate [id ::ObjectId])
   (let [doit (collection/find-map-by-id (mongo-options :doits-collection) (ObjectId. id))]
     (if (nil? doit)
       (throw+ {:type ::not-found} (str id " not found"))
@@ -99,7 +99,7 @@
 (defn delete-doit
   "Delete a DoIt by ID"
   [id]
-  (validate [id :ObjectId])
+  (validate [id ::ObjectId])
   (let [doit (get-doit id)]
     (if (ok? (collection/remove-by-id (mongo-options :doits-collection) (ObjectId. id)))
       doit
