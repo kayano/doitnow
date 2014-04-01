@@ -50,28 +50,24 @@
 ;; (Inspired by http://stackoverflow.com/questions/1640311/should-i-use-a-function-or-a-macro-to-validate-arguments-in-clojure)
 ;;
 
-(defmacro assert*
-  "Execute a test, if failed throw an ::invalid exception"
-  [val test]
-  `(if-not ~test
-     (throw+ {:type ::invalid})))
-
 (defmulti validate* (fn [val test] test))
 
 (defmethod validate* :ObjectId
   [id _]
-  (assert* id (and
-               (not (nil? id))
-               (string? id)
-               (re-matches #"[0-9a-f]{24}" id))))
+  (if-not (and
+           (not (nil? id))
+           (string? id)
+           (re-matches #"[0-9a-f]{24}" id))
+    (throw+ {:type ::invalid})))
 
 (defmethod validate* :DoIt
   [doit _]
-  (assert* doit (valid? (validation-set
-                         (presence-of :_id)
-                         (presence-of :title)
-                         (presence-of :created)
-                         (presence-of :modified)) doit)))
+  (if-not (valid? (validation-set
+                   (presence-of :_id)
+                   (presence-of :title)
+                   (presence-of :created)
+                   (presence-of :modified)) doit)
+    (throw+ {:type ::invalid})))
 
 (defn validate
   "Execute a sequence of validation tests"
@@ -95,7 +91,7 @@
   "Fetch a DoIt by ID"
   [id]
   (validate [id :ObjectId])
-  (let [doit (collection/find-by-id (mongo-options :doits-collection) (ObjectId. id))]
+  (let [doit (collection/find-map-by-id (mongo-options :doits-collection) (ObjectId. id))]
     (if (nil? doit)
       (throw+ {:type ::not-found} (str id " not found"))
       doit)))
@@ -104,6 +100,7 @@
   "Delete a DoIt by ID"
   [id]
   (validate [id :ObjectId])
-  (if (ok? (collection/remove-by-id (mongo-options :doits-collection) (ObjectId. id)))
-    nil
-    (throw+ {:type ::failed} "Delete Failed")))
+  (let [doit (get-doit id)]
+    (if (ok? (collection/remove-by-id (mongo-options :doits-collection) (ObjectId. id)))
+      doit
+      (throw+ {:type ::failed} "Delete Failed"))))

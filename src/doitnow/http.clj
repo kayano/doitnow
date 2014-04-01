@@ -56,3 +56,10 @@
     (response body)
     (status 201)
     (header "Location" url))))
+
+(defn ok
+  "Return an HTTP 200 (OK)"
+  [body]
+  (->
+   (response body)
+   (status 200)))

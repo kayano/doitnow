@@ -14,7 +14,7 @@
                                     defroutes]]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [doitnow.data :refer [create-doit get-doit]]
+            [doitnow.data :as data]
             [doitnow.http :as http]
             [doitnow.middleware :refer [wrap-exception-handler
                                         wrap-request-logger
@@ -33,17 +33,17 @@
                     (GET "/" []
                          (http/not-implemented))
                     (GET "/:id" [id]
-                         (get-doit id))
+                         (http/ok (data/get-doit id)))
                     (HEAD "/:id" [id]
                           (http/not-implemented))
                     (POST "/" [:as req]
-                          (let [doit (create-doit (keywordize-keys (req :body)))
+                          (let [doit (data/create-doit (keywordize-keys (req :body)))
                                 location (http/url-from req (str (doit :_id)))]
                             (http/created location doit)))
                     (PUT "/:id" [id]
-                         (http/not-implemented))
+                         (data/delete-doit id))
                     (DELETE "/:id" [id]
-                            (http/not-implemented))
+                            (http/ok (data/delete-doit id)))
                     (OPTIONS "/" []
                              (http/options [:options :get :head :put :post :delete]))
                     (ANY "/" []

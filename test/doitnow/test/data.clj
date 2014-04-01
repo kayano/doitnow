@@ -44,6 +44,7 @@
   (testing "Get valid doit"
     (let [created (create-doit {:title "Get Test DoIt"})
           doit (get-doit (.toString (created :_id)))]
+      (is (map? doit))
       (is (contains? created :_id))
       (is (contains? created :title))
       (is (contains? created :created))
@@ -57,6 +58,6 @@
   (testing "Delete doit"
     (let [created (create-doit {:title "Delete Test DoIt"})
           deleted (delete-doit (.toString (created :_id)))]
-      (is (nil? deleted))))
+      (is (not (nil? deleted)))))
   (testing "Delete with invalid ID"
     (is (thrown+? [:type :doitnow.data/invalid] (delete-doit "123456789")))))
