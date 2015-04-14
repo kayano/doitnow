@@ -16,8 +16,8 @@
 (def db-connection-info
   {:classname "org.postgresql.Driver"
    :subprotocol "postgresql"
-   :user "workshop"
-   :password "SuperSecretPassword"
+   :user "postgres"
+   :password "zaq12wsx"
    :subname "//localhost:5432/workshop"})
 
 ; set up korma
