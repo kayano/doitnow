@@ -16,6 +16,7 @@
             [compojure.route :as route]
             [doitnow.data :as data]
             [doitnow.http :as http]
+            [doitnow.query :as query]
             [doitnow.middleware :refer [wrap-exception-handler
                                         wrap-request-logger
                                         wrap-response-logger]]
@@ -40,6 +41,25 @@
                           (let [doit (data/create-doit (keywordize-keys (req :body)))
                                 location (http/url-from req (str (doit :_id)))]
                             (http/created location doit)))
+                    (PUT "/:id" [id]
+                         (data/delete-doit id))
+                    (DELETE "/:id" [id]
+                            (http/ok (data/delete-doit id)))
+                    (OPTIONS "/" []
+                             (http/options [:options :get :head :put :post :delete]))
+                    (ANY "/" []
+                         (http/method-not-allowed [:options :get :head :put :post :delete])))
+           (context "/websites" []
+                    (GET "/" []
+                         (http/ok (query/get-websites)))
+                    (GET "/:id" [id]
+                         (http/ok (data/get-doit id)))
+                    (HEAD "/:id" [id]
+                          (http/not-implemented))
+                    (POST "/" [:as req]
+                          (let [website (query/create-website (keywordize-keys (req :body)))
+                                location (http/url-from req (str (website :id)))]
+                            (http/created location website)))
                     (PUT "/:id" [id]
                          (data/delete-doit id))
                     (DELETE "/:id" [id]

@@ -1,6 +1,3 @@
-;; MongoDB Interface
-;;
-
 (ns doitnow.data
   (:require [clj-time.core :as time]
             [monger.collection :as collection]
@@ -10,8 +7,23 @@
             [monger.joda-time]
             [validateur.validation :refer [presence-of
                                            valid? validation-set]]
-            [slingshot.slingshot :refer [throw+]])
+            [slingshot.slingshot :refer [throw+]]
+            [korma.db :as korma]
+            [lobos.connectivity :as lobos])
   (:import org.bson.types.ObjectId))
+
+;;postgres
+(def db-connection-info
+  {:classname "org.postgresql.Driver"
+   :subprotocol "postgresql"
+   :user "workshop"
+   :password "SuperSecretPassword"
+   :subname "//localhost:5432/workshop"})
+
+; set up korma
+(korma/defdb db db-connection-info)
+; set up lobos
+(lobos/open-global db-connection-info)
 
 ;;
 ;; Database Connection Details
@@ -23,8 +35,8 @@
    :db "doitnow"
    :doits-collection "doits"})
 
-(connect! mongo-options)
-(set-db! (get-db (mongo-options :db)))
+;; (connect! mongo-options)
+;; (set-db! (get-db (mongo-options :db)))
 
 ;;
 ;; Utility Functions
