@@ -15,10 +15,12 @@
                  [org.clojure/java.jdbc "0.3.6"]
                  [postgresql "9.3-1102.jdbc41"]
                  [lobos "1.0.0-beta3"]
-                 [korma "0.4.0"]]
+                 [korma "0.4.0"]
+                 [ring-mock "0.1.5"]]
   :plugins [[lein-ring "0.9.3"]
             [lein-ancient "0.6.6"]]
-  :ring {:handler doitnow.handler/app}
+  :ring {:handler doitnow.handler/app
+         :uberwar-name "workshop.war"}
   :profiles
   {:dev
    {:dependencies [[javax.servlet/servlet-api "2.5"]
